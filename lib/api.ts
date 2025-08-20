@@ -55,7 +55,7 @@ export interface FetchNotesResponse {
 }
 
 // 📥 Получение списка заметок
-export const fetchNotes = async (page: number, search: string) => {
+export const fetchNotes = async (page: number, perPage: number, search: string, tag: string | undefined) => {
   const safePage = Number.isInteger(page) && page > 0 ? page : 1;
   const safeSearch = typeof search === "string" ? search.trim() : "";
 
