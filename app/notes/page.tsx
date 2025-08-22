@@ -3,10 +3,11 @@ import { fetchNoteById } from "@/lib/api";
 import NoteDetailsClient from "./[id]/NoteDetails.client";
 
 interface Props {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
-export default async function NoteDetailsPage({ params }: Props) {
+export default async function NoteDetailsPage(props: Props) {
+  const params = await props.params;
   const { id } = params;
   const queryClient = new QueryClient();
 

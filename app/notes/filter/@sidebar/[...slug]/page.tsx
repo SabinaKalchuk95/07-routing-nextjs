@@ -3,10 +3,11 @@ import NotesClient from "./Notes.client";
 import type { FetchNotesResponse } from "@/lib/api";
 
 interface NotesPageProps {
-  params: { slug?: string[] };
+  params: Promise<{ slug?: string[] }>;
 }
 
-export default async function NotesByTags({ params }: NotesPageProps) {
+export default async function NotesByTags(props: NotesPageProps) {
+  const params = await props.params;
   const slug = params.slug ?? ["all"];
   const tag = slug[0] === "all" ? undefined : slug[0];
 
