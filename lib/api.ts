@@ -55,13 +55,23 @@ export interface FetchNotesResponse {
 }
 
 // 📥 Получение списка заметок
-export const fetchNotes = async (page: number, perPage: number, search: string, tag: string | undefined) => {
+export const fetchNotes = async (
+  page: number,
+  perPage: number,
+  search: string,
+  tag?: string // ✅ теперь tag необязательный
+): Promise<FetchNotesResponse> => {
   const safePage = Number.isInteger(page) && page > 0 ? page : 1;
   const safeSearch = typeof search === "string" ? search.trim() : "";
 
-  const params: Record<string, string | number> = { page: safePage };
+  const params: Record<string, string | number> = { page: safePage, perPage };
+
   if (safeSearch) {
     params.search = safeSearch;
+  }
+
+  if (tag) {
+    params.tag = tag;
   }
 
   console.log("🔍 Fetching notes with params:", params);
@@ -72,19 +82,19 @@ export const fetchNotes = async (page: number, perPage: number, search: string, 
 };
 
 // 📝 Создание заметки
-export const createNote = async (newNote: NewNote) => {
+export const createNote = async (newNote: NewNote): Promise<Note> => {
   const res = await axios.post<Note>("/notes", newNote);
   return res.data;
 };
 
 // 🗑️ Удаление заметки
-export const deleteNote = async (noteId: string) => {
+export const deleteNote = async (noteId: string): Promise<Note> => {
   const res = await axios.delete<Note>(`/notes/${noteId}`);
   return res.data;
 };
 
 // 📄 Получение заметки по ID
-export const fetchNoteById = async (id: string) => {
+export const fetchNoteById = async (id: string): Promise<Note> => {
   const res = await axios.get<Note>(`/notes/${id}`);
   return res.data;
 };
