@@ -36,9 +36,12 @@ export default function NotesClient({ initialNotes }: NotesClientProps) {
     updateSearchQuery(value);
   };
 
+  // Set a default perPage value, e.g., 10
+  const perPage = 10;
+
   const { data, isLoading } = useQuery<FetchNotesResponse>({ 
-    queryKey: ["notes", currentPage, searchQuery],
-    queryFn: () => fetchNotes(currentPage, searchQuery),
+    queryKey: ["notes", currentPage, perPage, searchQuery],
+    queryFn: () => fetchNotes(currentPage, perPage, searchQuery),
     initialData: initialNotes,
     placeholderData: keepPreviousData,
   })
