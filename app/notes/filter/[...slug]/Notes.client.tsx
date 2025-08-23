@@ -7,7 +7,7 @@ import css from "./Notes.client.module.css";
 
 import NoteList from "@/components/NoteList/NoteList";
 import { fetchNotes } from "@/lib/api";
-import type { Note } from "../../../../../types/note";
+import type { Note } from "../../../../types/note";
 import type { FetchNotesResponse } from "@/lib/api";
 import SearchBox from "@/components/SearchBox/SearchBox";
 import Modal from "@/components/Modal/Modal";
