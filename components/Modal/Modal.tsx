@@ -1,48 +1,52 @@
 import { createPortal } from "react-dom";
-import { useEffect } from 'react';
-import css from "./Modal.module.css"
+import css from "./Modal.module.css";
+import { useEffect, type ReactNode } from "react";
 
 interface ModalProps {
-    onClose: () => void;
-    children: React.ReactNode;
+  children: ReactNode;
+  close: () => void;
 }
 
-export default function Modal({ onClose, children }: ModalProps) {
-    const handleBackdropClick = (event: React.MouseEvent<HTMLDivElement>) => {
-        if (event.target === event.currentTarget) {
-            onClose();
-        }
+export default function Modal({ children, close }: ModalProps) {
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        close();
+      }
     };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [close]);
 
-    useEffect(() => {
-        const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === "Escape") {
-                onClose();
-            }
-        };
+  useEffect(() => {
+    document.body.classList.add("no-scroll");
+    return () => {
+      document.body.classList.remove("no-scroll");
+    };
+  }, []);
 
-        document.addEventListener("keydown", handleKeyDown);
-        document.body.style.overflow = "hidden";
+  const handleBackdropClick = (e: React.MouseEvent) => {
+    if (e.target === e.currentTarget) {
+      close();
+    }
+  };
 
-        return () => {
-            document.removeEventListener("keydown", handleKeyDown);
-            document.body.style.overflow = "";
-        };
-    }, [onClose]);
-
-
-    return createPortal(
-        <div
-            className={css.backdrop}
-            role="dialog"
-            aria-modal="true"
-            onClick={handleBackdropClick}
-        >
-            
-            <div className={css.modal}>
-                {children}
-            </div>
-        </div>,
-        document.body
-    );
+  return createPortal(
+    <div
+      className={css.backdrop}
+      onClick={handleBackdropClick}
+      role="dialog"
+      aria-modal="true"
+    >
+      <div className={css.modal}>
+        <button className={css.close} onClick={close}>
+        &times;
+        </button>
+        {children}
+      </div>
+    </div>,
+    document.body,
+  );
 }
