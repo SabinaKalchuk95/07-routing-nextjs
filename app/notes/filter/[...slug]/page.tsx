@@ -6,23 +6,27 @@ import {
   QueryClient,
 } from '@tanstack/react-query';
 
-type Props = {
-  params: Promise<{ slug?: string[] }>;
-};
-
-
-export default async function NotesByTags({ params }: Props) {
-  const { slug } = await params;
-
+export default async function NotesByTags({
+  params,
+}: {
+  params: { slug?: string[] };
+}) {
   const initialPage = 1;
   const initialSearch = '';
-const perPage = 12;
-  const tag = slug?.[0] === 'All' ? undefined : slug?.[0];
+  const perPage = 12;
+  const tag = params.slug?.[0] === 'All' ? undefined : params.slug?.[0];
 
   const queryClient = new QueryClient();
+
   await queryClient.prefetchQuery({
-    queryKey: ['notes', initialSearch, initialPage, tag],
-    queryFn: () => fetchNotes(initialSearch, initialPage, perPage, tag),
+    queryKey: ['notes', { search: initialSearch, page: initialPage, perPage, tag }],
+    queryFn: () =>
+      fetchNotes({
+        search: initialSearch,
+        page: initialPage,
+        perPage,
+        tag,
+      }),
   });
 
   return (

@@ -15,7 +15,7 @@ import Loading from '../../../loading';
 import ErrorMessage from '@/components/ErrorMessage/ErrorMessage';
 
 interface DataProps {
-  tag?: string | undefined;
+  tag?: string;
 }
 
 export default function NotesClient({ tag }: DataProps) {
@@ -31,29 +31,26 @@ export default function NotesClient({ tag }: DataProps) {
     setShowModal(false);
     setCurrentPage(1);
   };
-  
+
   useEffect(() => {
     setCurrentPage(1);
   }, [tag]);
 
   const { data, isLoading, isError, isSuccess } = useQuery({
-    queryKey: ['notes', debouncedSearch, currentPage, itemsPerPage, tag],
+    queryKey: ['notes', { search: debouncedSearch, page: currentPage, perPage: itemsPerPage, tag }],
     queryFn: () =>
-      fetchNotes(
-        debouncedSearch,
-        currentPage,
-        itemsPerPage,
-        tag === 'All' ? undefined : tag
-      ),
+      fetchNotes({
+        search: debouncedSearch,
+        page: currentPage,
+        perPage: itemsPerPage,
+        tag: tag === "All" ? undefined : tag,
+      }),
     placeholderData: keepPreviousData,
   });
 
   const handlePageClick = (selectedItem: { selected: number } | number) => {
-    if (typeof selectedItem === 'number') {
-        setCurrentPage(selectedItem + 1);
-    } else {
-        setCurrentPage(selectedItem.selected + 1);
-    }
+    const page = typeof selectedItem === 'number' ? selectedItem : selectedItem.selected;
+    setCurrentPage(page + 1);
   };
 
   const handleInputChange = (value: string) => {
@@ -68,13 +65,13 @@ export default function NotesClient({ tag }: DataProps) {
     <div className={css.app}>
       <Toaster />
       <header className={css.toolbar}>
-        <SearchBox onSearchChange={handleInputChange} />
+        <SearchBox value={search} onSearch={handleInputChange} />
 
         {totalPages > 1 && (
           <Pagination
-            pageCount={totalPages}
-            onPageChange={handlePageClick}
-            currentPage={currentPage - 1}
+            totalNumberOfPages={totalPages}
+            currentActivePage={currentPage}
+            setPage={setCurrentPage}
           />
         )}
 
@@ -84,7 +81,7 @@ export default function NotesClient({ tag }: DataProps) {
 
         {showModal && (
           <Modal close={closeModalWindow}>
-            <NoteForm onCancel={closeModalWindow} />
+            <NoteForm onCloseModal={closeModalWindow} />
           </Modal>
         )}
       </header>
