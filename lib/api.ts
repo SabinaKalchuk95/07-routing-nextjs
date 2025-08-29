@@ -1,3 +1,4 @@
+// lib/api.ts
 import axios from "axios";
 import type { Note } from "@/types/note";
 
@@ -45,7 +46,20 @@ export const fetchNotes = async ({
   const res = await axios.get<FetchNotesResponse>("/notes", { params });
   return res.data;
 };
+
 export const fetchNoteById = async (id: string): Promise<Note> => {
   const res = await axios.get<Note>(`/notes/${id}`);
+  return res.data;
+};
+
+// Добавляем функцию для создания новой заметки
+export const createNote = async (newNote: NewNote): Promise<Note> => {
+  const res = await axios.post<Note>("/notes", newNote);
+  return res.data;
+};
+
+// Добавляем функцию для удаления заметки
+export const deleteNote = async (id: string): Promise<Note> => {
+  const res = await axios.delete<Note>(`/notes/${id}`);
   return res.data;
 };

@@ -15,84 +15,85 @@ import Loading from '../../../loading';
 import ErrorMessage from '@/components/ErrorMessage/ErrorMessage';
 
 interface DataProps {
-  tag?: string;
+  tag?: string;
 }
 
 export default function NotesClient({ tag }: DataProps) {
-  const itemsPerPage = 12;
+  const itemsPerPage = 12;
 
-  const [search, setSearch] = useState('');
-  const [showModal, setShowModal] = useState(false);
-  const [debouncedSearch] = useDebounce(search, 500);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [search, setSearch] = useState('');
+  const [showModal, setShowModal] = useState(false);
+  const [debouncedSearch] = useDebounce(search, 500);
+  const [currentPage, setCurrentPage] = useState(1);
 
-  const openModalWindow = () => setShowModal(true);
-  const closeModalWindow = () => {
-    setShowModal(false);
-    setCurrentPage(1);
-  };
+  const openModalWindow = () => setShowModal(true);
+  const closeModalWindow = () => {
+    setShowModal(false);
+    setCurrentPage(1);
+  };
 
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [tag]);
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [tag]);
 
-  const { data, isLoading, isError, isSuccess } = useQuery({
-    queryKey: ['notes', { search: debouncedSearch, page: currentPage, perPage: itemsPerPage, tag }],
-    queryFn: () =>
-      fetchNotes({
-        search: debouncedSearch,
-        page: currentPage,
-        perPage: itemsPerPage,
-        tag: tag === "All" ? undefined : tag,
-      }),
-    placeholderData: keepPreviousData,
-  });
+  const { data, isLoading, isError, isSuccess } = useQuery({
+    queryKey: ['notes', { search: debouncedSearch, page: currentPage, perPage: itemsPerPage, tag }],
+    queryFn: () =>
+      fetchNotes({
+        search: debouncedSearch,
+        page: currentPage,
+        perPage: itemsPerPage,
+        tag: tag === "All" ? undefined : tag,
+      }),
+    placeholderData: keepPreviousData,
+  });
 
-  const handlePageClick = (selectedItem: { selected: number } | number) => {
-    const page = typeof selectedItem === 'number' ? selectedItem : selectedItem.selected;
-    setCurrentPage(page + 1);
-  };
+// Удаляем неиспользуемую функцию, чтобы убрать предупреждение.
+// const handlePageClick = (selectedItem: { selected: number } | number) => {
+//   const page = typeof selectedItem === 'number' ? selectedItem : selectedItem.selected;
+//   setCurrentPage(page + 1);
+// };
 
-  const handleInputChange = (value: string) => {
-    setSearch(value);
-    setCurrentPage(1);
-  };
+  const handleInputChange = (value: string) => {
+    setSearch(value);
+    setCurrentPage(1);
+  };
 
-  const notesToDisplay = data?.notes || [];
-  const totalPages = data?.totalPages || 0;
+  const notesToDisplay = data?.notes || [];
+  const totalPages = data?.totalPages || 0;
 
-  return (
-    <div className={css.app}>
-      <Toaster />
-      <header className={css.toolbar}>
-        <SearchBox value={search} onSearch={handleInputChange} />
+  return (
+    <div className={css.app}>
+      <Toaster />
+      <header className={css.toolbar}>
+        <SearchBox value={search} onSearch={handleInputChange} />
 
-        {totalPages > 1 && (
-          <Pagination
-            totalNumberOfPages={totalPages}
-            currentActivePage={currentPage}
-            setPage={setCurrentPage}
-          />
-        )}
+        {totalPages > 1 && (
+          <Pagination
+            totalNumberOfPages={totalPages}
+            currentActivePage={currentPage}
+            setPage={setCurrentPage}
+          />
+        )}
 
-        <button className={css.button} onClick={openModalWindow}>
-          Create note +
-        </button>
+        <button className={css.button} onClick={openModalWindow}>
+          Create note +
+        </button>
 
-        {showModal && (
-          <Modal close={closeModalWindow}>
-            <NoteForm onCloseModal={closeModalWindow} />
-          </Modal>
-        )}
-      </header>
-      {isLoading && <Loading />}
-      {isError && <ErrorMessage />}
-      {isSuccess &&
-        (notesToDisplay.length > 0 ? (
-          <NoteList notes={notesToDisplay} />
-        ) : (
-          <p>No notes found. Create your first note!</p>
-        ))}
-    </div>
-  );
+        {showModal && (
+          <Modal close={closeModalWindow}>
+            <NoteForm onCloseModal={closeModalWindow} />
+          </Modal>
+        )}
+      </header>
+      {isLoading && <Loading />}
+      {isError && <ErrorMessage />}
+      {isSuccess &&
+        (notesToDisplay.length > 0 ? (
+          <NoteList notes={notesToDisplay} />
+        ) : (
+          <p>No notes found. Create your first note!</p>
+        ))}
+    </div>
+  );
 }
